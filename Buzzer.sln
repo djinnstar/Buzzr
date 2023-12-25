@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Buzzer", "Buzzer\Buzzer\Buzzer.csproj", "{FC9210AF-B57F-4FA6-9EC4-A565278605C5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FC9210AF-B57F-4FA6-9EC4-A565278605C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC9210AF-B57F-4FA6-9EC4-A565278605C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC9210AF-B57F-4FA6-9EC4-A565278605C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC9210AF-B57F-4FA6-9EC4-A565278605C5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {87D9D720-20F3-4973-8E66-76CE1F1CE8BE}
+	EndGlobalSection
+EndGlobal

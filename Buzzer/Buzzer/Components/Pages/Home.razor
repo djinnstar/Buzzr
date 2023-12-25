@@ -1,0 +1,130 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.SignalR.Client
+@using System.Diagnostics
+@inject NavigationManager Navigation
+@implements IAsyncDisposable
+
+<PageTitle>Home</PageTitle>
+
+@if (viewMode == ViewMode.Unset)
+{
+    <input @bind="name" type="text" id="name">
+    @if (data?.HostConnectionID == "")
+    {
+        <button @onclick="JoinAsHost">Join As Host</button>
+    }
+    <button @onclick="JoinAsBuzzer">Join As Player</button>
+}
+@if (viewMode == ViewMode.Buzzer)
+{
+    <p>Playing as: @name</p>
+    <button @onclick="Buzz">BUZZ</button>
+    @if (data is not null)
+    {
+        <HistoricalView data="data" />
+    }
+
+}
+@if (data?.HostConnectionID == hubConnection?.ConnectionId)
+{
+    <p>Hosting.</p>
+    <button @onclick="SetStopWatch">Stopwatch</button>
+    <p>@timerValue</p>
+    @if (data is not null)
+    {
+        <HistoricalView data="data" />
+    }
+
+}
+
+@code {
+    public enum ViewMode { Unset, Buzzer, Host }
+    public ViewMode viewMode { get; set; } = ViewMode.Unset;
+    private string name { get; set; } = "";
+    private HubConnection? hubConnection;
+    private List<string> messages = new List<string>();
+    private string? userInput;
+    private string? messageInput;
+    public BuzzData? data;
+
+    public System.Timers.Timer timer = new(1000);
+    public double? timerValue = null;
+
+
+    private async void SetStopWatch()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.SendAsync("Clear");
+        }
+
+        timerValue = 0;
+        timer.Enabled = true;
+        timer.Start();
+
+    }
+
+    private void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
+    {
+        if (timerValue is null)
+        {
+            timerValue = 0;
+        }
+        timerValue += 1;
+        InvokeAsync(() => StateHasChanged());
+    }
+
+    public async void JoinAsHost()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.SendAsync("JoinAsHost", name);
+            viewMode = ViewMode.Host;
+        }
+    }
+
+
+    public void JoinAsBuzzer()
+    {
+        viewMode = ViewMode.Buzzer;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        timer.Elapsed += OnTimedEvent;
+        timer.AutoReset = true;
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/chathub"))
+            .Build();
+
+        hubConnection.On<string>("UpdateData", (dataEncoded) =>
+        {
+            data = BuzzData.Deserialize(dataEncoded);
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+        await hubConnection.SendAsync("UpdateGame");
+
+    }
+
+    private async Task Buzz()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.SendAsync("Buzz", name, DateTime.Now.Ticks.ToString());
+        }
+    }
+
+    public bool IsConnected =>
+        hubConnection?.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}

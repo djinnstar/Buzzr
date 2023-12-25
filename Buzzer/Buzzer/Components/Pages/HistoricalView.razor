@@ -1,0 +1,10 @@
+﻿@foreach (var pair in data.Buzzes)
+{
+    <p>@pair.Name buzzed at @pair.Time</p>
+}
+
+
+@code {
+    [Parameter]
+    public BuzzData data { get; set; }
+}
